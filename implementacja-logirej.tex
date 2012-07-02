@@ -1,0 +1,70 @@
+%implementacja-logirej
+Implementacja logowania i rejestracji użytkowników to pierwsze zadanie zrealizowane podczas pisania projektu. W trakcie poszerzania możliwości serwisu, prezentowany kod często ulegał refaktoryzacji. Poniższy rozdział prezentuje ostateczną wersję kodu modułu rejestracji i logowania.
+
+Pierwsza prezentowana funkcjonalność została napisana w języku \emph{Python} z zastosowaniem \emph{frameworka Django}, czyli tak jak większość opisywanej aplikacji. Mając na uwadzę stosowany wzorzec architektoniczny \emph{MVC}, w pierwszej kolejności zaprezentowany będzie model, a po nim logika biznesowa.
+
+Najważniejszy model aplikacji, a zarazem profil użytkownika to klasa \texttt{UserProfile} (listing \ref{kod:UserProfile}).\\
+
+\lstinputlisting[
+  label=kod:UserProfile, 
+  caption=Klasa modelu UserProfile]
+  {src/UserProfile.py}
+
+\vspace{1em}
+Zaprezentowany kod ma swoje przełożenie na budowę tabel w bazie danych. \emph{Django} wykorzystuje modele po ich napisaniu do stworzenia tabel o takiej samej nazwie jak nazwa klasy modelu poprzedzona nazwą aplikacji. Parametry klasy \texttt{UserProfile} to kolumny tabeli.
+
+Komentarza wymaga parametr \texttt{user}, \texttt{friends}
+oraz 
+\texttt{privacy}. 
+Są to odwołania do kluczy obcych innych tabel utworzonych przez inne modele \emph{Django}. Parametr \texttt{user} to obiekt klasy wbudowanej \texttt{User}. Jest używany wszędzie tam gdzie wymagany jest obiekt użytkownika lub \emph{ID} encji w bazie danych. Parametr \texttt{friends} jest referencją do innej tabeli, utworzonej podczas tworzenia tabeli dla modelu \texttt{UserProfile}. Przechowuje ona relacje zawartej znajomości między użytkownikami serwisu. I ostatni parametr - \texttt{privacy} to referencja do klasy \texttt{UserPrivacy}, która odpowiada za prywatność użytkowników (listing \ref{kod:UserPrivacy}).\\
+
+\lstinputlisting[
+  label=kod:UserPrivacy, 
+  caption=Klasa modelu UserPrivacy]{src/UserPrivacy.py}
+
+\vspace{1em}
+Za logikę aplikacji odpowiadają widoki. Poniżej prezentacja kodu aplikacji \texttt{accounts}, który realizuje rejestrowanie użytkowników (listing \ref{kod:register}). \\
+
+\vspace{1em}
+Metoda \texttt{register} to zwykła funkcja napisana w języku \emph{Python}. Przyjmuje ona tylko jeden parametr, którym jest żądanie (\texttt{request}) przesłane przez użytkownika. Jest to obiekt klasy \texttt{HttpRequest}, który przechowuje dość sporo informacji. Najważniejsza dla funkcji jest tablica \texttt{POST}, która przechowue dane wpisane do formularza. 
+Za formularz rejestracji odpowiada klasa \texttt{RegisterForm} (listing \ref{kod:RegisterForm}).\\
+
+\lstinputlisting[label=kod:RegisterForm, caption=Formularz rejestracji nowego użytkownika]{src/RegisterForm.py}
+
+\vspace{1em}
+Formularz \texttt{RegisterForm} posiada cztery parametry, które są obiektami klas wbudowanych w \emph{Django}. Sam formularz to również klasa i dziedziczy po głównej klasie \texttt{Form} z pakietu \texttt{django.forms}. Dzięki generalizacji, klasa formularza ma dostęp do trzech niezbędnych metod - \texttt{is\_valid}, \texttt{clean} oraz \texttt{save}. Pierwsza jest używana w funkcji \texttt{register} z poprzedniego kodu. Wywołuje ona metodę \texttt{clean} w klasie \texttt{Form}, która weryfikuje poprawność wypełnionego formularza i zwraca błąd, gdy formularz jest źle wypełniony. Metodę tą można nadpisać i dostosować do własnych wymagań, jednak w tej klasie wykorzystano tylko \texttt{is\_valid}, która zwraca \texttt{True} lub \texttt{False}.
+
+Kolejna metoda - \texttt{save} - dodatkowo waliduje poprawność wprowadzonych danych, w sposób wymagany do poprawnego działania serwisu. Jeżeli weryfikacja napotka błąd, do widoku zostanie zwrócony \emph{False}, a na stronie zostanie wyświetlony odpowiedni komunikat. Jeżeli weryfikacja nie napotka żadnych problemów, zostaje utworzone nowe konto użytkownika, nowy profil oraz prywatny katalog na dysku serwera.
+
+Pola formularza będą wyświetlone na stronie, bez znaczenia na wynik walidacji danych. Funkcja widoku zawsze tworzy instancję formularza, która jest zwracana jako parametr do szablonu \emph{template} \texttt{register.html}. Tam traktowany jest jak obiekt w specjalnym języku szablonów \emph{Django}. Na przykład wywołanie \texttt{\{\{form.email\}\}} zwróci na stronie formularz \emph{input} dla pola \emph{e\-mail}.
+
+W kolejnej części znajduje się opis kodu odpowiedzialnego za logowanie użytkownika. W tym przypadku zaprezentowany zostanie wyłącznie kod logiki, ponieważ część modelu jest taka sama jak w przypadku rejestracji. Poniżej znajduje się kod widoku - funkcja \texttt{log\_in} z widoku aplikacji \texttt{accounts} (listing \ref{kod:log_in}).\\
+
+\lstinputlisting[label=kod:log_in, caption=Funkcja logowania]{src/log_in.py}
+
+\vspace{1em}
+W tym przypadku, weryfikacja danych wymaganych do poprawnego działania aplikacji realizowana jest bezpośrednio po stronie widoku. Funkcja wywołuje formularz \texttt{LoginForm} (listing \ref{kod:LoginForm}).\\
+
+\lstinputlisting[label=kod:LoginForm, caption=Formularz logowania]{src/LoginForm.py}
+
+\vspace{1em}
+Rolę jaką pełni funkcja widoku to przede wszystkim dopisywanie do obiektu \texttt{messages} wiadomości, które wyświetlone zostaną na stronie osoby wywołującej stronę logowania. Obiekt \texttt{messages} to element \emph{frameworka} o tej samej nazwie, który jest częścią \emph{Django}. Jego działanie jest proste i w zaprojektowanej pracy, realizuje przesyłanie wiadomości do użytkownika, które wyświetlone będą na stronie.
+
+Po przeprowadzonej weryfikacji, w odpowiedzi zostanie zwrócony obiekt formularza do parametru \texttt{form}, uzupełniony o wiadomość w obiekcie \texttt{messages} - obiekt ten zwrócony jest do żadania w lini 33. 
+
+Implementacja modułu logowania i rejestracji może z początku wyglądać dziwnie, mając w pamięci standardowe podejście do tworzenia i wyświetlania formularzy na stronie internetowej, na przykład w języku \emph{PHP}. Formularze \emph{Django} mają być przede wszystkim tak napisane, aby ich kod nie był powtarzany (zgodnie z zasadą \emph{DRY}) i po krótkiej analizie kodu, można dojść do wniosku, że framework robi to w sposób czytelniejszy. Dodatkowo \emph{Django} wyposarza programistę w dodatkowe narzędzia wspomagające walidację i prezentację danych na stronie.
+
+Możliwość logowania na serwerze została zaimplementowana także w aplikacji na system \emph{Android}. Poniżej znajduje się kod klasy \texttt{Main}, gdzie realizowana jest podstawowa logika programu na platformie \emph{Android}.
+Klasa \texttt{Main} posiada klasy \texttt{User} oraz \texttt{Geolocation} (listing \ref{kod:android-main}). Dziedziczy po głównej klasie \emph{Android} - \texttt{Activity} i implementuje interfejs \texttt{OnClickListener} udostępniający metodę \texttt{onClick} wywoływaną gdy dotknięty zostanie przycisk \texttt{loginButton}. Logika tej klasy realizowana jest w metodzie \texttt{onClick}, gdzie ładowane są ustawienia oraz uruchamiane jest logowanie do serwera.\\
+
+\lstinputlisting[label=kod:android-main, caption=Klasa Main aplikacji \emph{Android}]{src/android-main.java}
+
+\vspace{1em}
+Metoda \texttt{onClick} tworzy obiekt klasy \texttt{User} o nazwie \texttt{user}, której konstruktor przyjmuje dwa parametry - \emph{e\-mail} oraz hasło pobrane z konfiguracji \texttt{preferences}. Następnie dla obiektu \texttt{user} wywołana zostaje metoda \texttt{tryLogin}, która loguje użytkownika na serwerze. W odpowiedzi aplikacja otrzyma kod \emph{200} albo \emph{401}.
+
+Logowanie po stronie serwera realizuje funkcja \texttt{mlogin} z widoku aplikacji \texttt{mobile}. Jest ona podobna do funkcji \texttt{log\_in}, z tą różnicą, że \texttt{mlogin} przyjmuje dane w formacie \emph{JSON}. Po odczytaniu ich, następuje logowanie na serwerze lub zostanie zwrócony bład w razie niepowodzenia. Poniżej znajduje się kod funkcji \texttt{mlogin}.\\
+
+\vspace{1em}
+W przypadku \texttt{mlogin}, funkcja wykorzystuje formularz \texttt{LoginForm} z aplikacji \texttt{accounts}. Dane \emph{JSON} odczytane z przesłanego żądania \emph{HTTP} są przekazane do konstruktora klasy \texttt{LoginForm}. Jeżeli przesłane są niepoprawne, zwrócony zostanie status \emph{401}. Zaletą wykorzystania wcześniej napisanego formularza, jest wykorzystanie metody \texttt{clean}, która waliduje przesłane dane i zabezpiecza serwer przed niebezpiecznymi atakami.
+
+Logowanie w serwisie ze strony aplikacji na platformę \emph{Android} i wewnątrz serwisu zostało zaprezentowane. Prezentowany kod realizuje swoje zadanie tak jak projektowano. Walidacja danych jest wykonywana poprawnie, a szczegóły walidacji oraz przyjęte przypadki testowe będą prezentowane w dziale \ref{sec:testy}.

@@ -1,0 +1,171 @@
+\documentclass[12pt,twoside,a4paper]{article}
+
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage{url}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{natbib}
+
+\floatstyle{ruled}
+
+\lstset {
+basicstyle=\scriptsize\ttfamily ,
+numbers=left,
+keywordstyle=\color{blue},
+inputencoding=utf8,
+literate={ą}{{\k{a}}}1
+{Ą}{{\k{A}}}1
+{ę}{{\k{e}}}1
+{Ę}{{\k{E}}}1
+{ó}{{\'o}}1
+{Ó}{{\'O}}1
+{ś}{{\'s}}1
+{Ś}{{\'S}}1
+{ł}{{\l{}}}1
+{Ł}{{\L{}}}1
+{ż}{{\.z}}1
+{Ż}{{\.Z}}1
+{ź}{{\'z}}1
+{Ź}{{\'Z}}1
+{ć}{{\'c}}1
+{Ć}{{\'C}}1
+{ń}{{\'n}}1
+{Ń}{{\'N}}1,
+}
+\usepackage{caption}
+
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+\captionsetup[figure]{singlelinecheck=off,justification=raggedright}
+
+\frenchspacing
+\linespread{1.3}
+%\geometry{verbose, a4paper, tmargin=2cm, bmargin=2cm,lmargin=2cm,rmargin=2cm}
+%\geometry{verbose, a4paper, tmargin=2.5cm, bmargin=2.5cm,lmargin=3cm,rmargin=2cm}
+\geometry{verbose, a4paper, tmargin=2cm, bmargin=2cm,lmargin=3cm,rmargin=2cm}
+
+
+\pagestyle{fancy} %% deklarujemy styl "fancy"
+\fancyhead{} \fancyfoot{} %% "zresetuj" zawartość pagin
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhead[LE,RO]{\normalfont \small \thepage}
+\fancyhead[LO]{\normalfont \small \itshape \rightmark}
+\fancyhead[RE]{\normalfont \small \itshape \rightmark}
+\fancypagestyle{plain}{\fancyhead{}\renewcommand{\headrulewidth}{0pt}} %% ustaw paginy dla stylu plain
+
+%\fancyhead{\chead{Wyższa Szkoła Informatyki Stosowanej i Zarządzania w Warszawie}}
+%\pagestyle{fancy}
+
+% title page
+
+% koniec strona tytulowa
+\newcommand{\HRule}{\rule{\linewidth}{0.1mm}}
+
+\begin{document}
+\input{strona_tytulowa}
+
+\include{Spis_tresci}
+
+\addcontentsline{toc}{section}{Słownik}
+\include{slownik}
+
+\newpage
+\section*{Wstęp}
+\addcontentsline{toc}{section}{Wstęp}
+	\input{wstep}
+
+\newpage
+\section{Cel pracy}
+	\input{cele_pracy}
+	
+\newpage	
+\section{Środowisko projektu}
+	\input{srodowisko_projektu}
+
+\newpage		
+\section{Plan pracy}
+	\input{zakres_pracy}
+	\include{wymagania}
+	\include{specyfikacja}
+
+\newpage
+\section{Architektura aplikacji}
+	\input{architektura}
+	\subsection{Język PHP}
+		\input{architektura-php}
+		\subsubsection{Framework CakePHP}
+		\subsubsection{Wzorzec projektowy MVC}
+	
+	\subsection{Wykorzystane technologie}
+		\subsubsection{PostgreSQL}
+			\input{architektura-postgresql}
+
+\newpage
+\section{Opis modułów i komunikacja}
+	\input{komunikacja}
+	\subsection{Diagramy klas}\label{kom-diagram-klas}	
+		\input{komunikacja-diagram-klas}
+
+
+	\subsection{Aplikacja internetowa}
+
+	\subsection{Edycja profilu}
+		
+	\subsection{Nawiązane znajomości}
+	
+	\subsection{Ochrona prywatności danych osobowych}
+		
+	\subsection{Administracja systemem}
+
+\newpage
+\section{Implementacja}\label{sec:implementacja}
+	\input{implementacja}
+	\subsection{Logowanie i rejestracja}
+	  \input{implementacja-logirej}
+
+	\subsection{Edycja profilu}
+\newpage	
+\section{Testy}\label{sec:testy}
+  \input{testy}
+	\subsection{Przypadki testowe dla testów jednostkowych}\label{sec:przypadki_testowe}
+	\subsection{Testy funkcjonalne i integracyjne}\label{sec:testy_funkcjonalne}
+	\subsection{Testy akceptacyjne}
+	\subsection{Wnioski z testów}\label{sec:testy_wnioski}
+\newpage	
+\section{Wdrożenie aplikacji}
+	\subsection{Instalacja aplikacji na serwerze Apache}
+\newpage	
+\section{Zakończenie}
+  \input{zakonczenie}
+  \subsection{Wnioski}
+
+  \subsection{Dalszy rozwój aplikacji}
+
+
+\newpage
+\section{Streszczenie}
+
+\include{referencje}
+
+\include{spis_rysunkow}
+
+\include{spis_listingow}
+
+\section*{Literatura}\label{sec:literatura}
+\addcontentsline{toc}{section}{Literatura}
+\bibliography{bibliografia}
+\bibliographystyle{plain}
+
+%\include{zalaczniki}
+
+
+\end{document}
